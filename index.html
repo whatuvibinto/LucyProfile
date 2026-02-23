@@ -63,7 +63,6 @@
             transition: transform 0.2s ease-out;
         }
 
-        /* 【3D強化】カード背面に落ちる深い影 (Z=-30px) */
         .card-shadow {
             position: absolute;
             inset: 0;
@@ -78,7 +77,6 @@
             box-shadow: 0 50px 100px rgba(0,0,0,0.9), 0 15px 40px rgba(0,0,0,0.5);
         }
 
-        /* カードの土台 (Z=0) */
         .card-base {
             position: absolute;
             inset: 0;
@@ -87,7 +85,6 @@
             transform: translateZ(0);
         }
 
-        /* 【枠線修正】画像より手前に被せる専用の枠線レイヤー (Z=3px) */
         .card-frame {
             position: absolute;
             inset: 0;
@@ -99,7 +96,6 @@
             transform: translateZ(3px); 
         }
 
-        /* 背景写真レイヤー (Z=1px) */
         .art-bg {
             position: absolute;
             top: 0; left: 0;
@@ -121,7 +117,6 @@
             pointer-events: none;
         }
 
-        /* 下からの白グラデーション (Z=2px) */
         .card-gradient {
             position: absolute;
             bottom: 0; left: 0;
@@ -134,7 +129,6 @@
             transform: translateZ(2px);
         }
 
-        /* 動的な光沢・グレア (Z=100px) */
         .card-glare {
             position: absolute;
             inset: 0;
@@ -148,11 +142,9 @@
             );
             mix-blend-mode: overlay;
             pointer-events: none;
-            /* 【3D強化】光沢を一番手前に */
             transform: translateZ(100px);
         }
 
-        /* コンテンツレイヤー */
         .art-overlay {
             position: absolute;
             inset: 0;
@@ -164,8 +156,6 @@
             align-items: center;
             text-align: center;
             pointer-events: none; 
-            
-            /* 【3D強化】子要素のZ軸移動を許可 */
             transform-style: preserve-3d;
         }
 
@@ -173,14 +163,10 @@
             pointer-events: auto;
         }
 
-        /* ==========================================
-           コンテンツ内部
-           ========================================== */
         .art-header {
             width: 100%;
             margin-top: 0;
             margin-bottom: 35px;
-            /* 【3D強化】テキストを画面手前に浮かせる */
             transform: translateZ(50px);
             text-shadow: 0 4px 15px rgba(0,0,0,0.8);
         }
@@ -214,11 +200,9 @@
             justify-content: center;
             gap: 16px;
             width: 100%;
-            /* 【3D強化】QRコードをさらに強く浮かせる */
             transform: translateZ(80px);
         }
 
-        /* QRコンテナ */
         .modal-qr-container {
             width: 100%;
             max-width: 190px;
@@ -245,7 +229,6 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            /* 画像自体にも少し影を落とし実体感を出す */
             filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
         }
 
@@ -258,25 +241,113 @@
             text-transform: uppercase;
             text-shadow: 0 2px 5px rgba(0,0,0,0.8);
         }
+
+        /* ==========================================
+           ポップアップ（モーダル）のスタイル
+           ========================================== */
+        .welcome-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px); /* 背景をぼかす */
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .welcome-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .welcome-modal-content {
+            background: rgba(20, 20, 20, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 35px 25px;
+            max-width: 85%;
+            width: 320px;
+            text-align: center;
+            transform: translateY(20px) scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .welcome-modal.show .welcome-modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .welcome-modal h2 {
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin: 0 0 15px;
+            color: var(--theme-color);
+            letter-spacing: 0.1em;
+        }
+
+        .welcome-modal p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--color-gray-300);
+            margin: 0 0 25px;
+            font-weight: 500;
+        }
+
+        .welcome-modal .ja-text {
+            display: block;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            color: #aaa;
+        }
+
+        .close-btn {
+            background: var(--theme-color);
+            color: var(--color-black);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .close-btn:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
+
+    <div id="welcome-modal" class="welcome-modal">
+        <div class="welcome-modal-content">
+            <h2>NOTICE</h2>
+            <p>
+                The destination of the QR code changes depending on the time of day.<br>
+                <span class="ja-text">時間帯によってリンク先が変わります。</span>
+            </p>
+            <button id="close-modal-btn" class="close-btn">GOT IT</button>
+        </div>
+    </div>
 
     <div class="scene" id="scene">
         <div class="card-container" id="card">
             
             <div class="card-shadow"></div>
-
             <div class="card-base"></div>
-            
             <div class="card-frame"></div>
-            
             <div class="card-gradient"></div>
-            
             <div class="card-glare"></div>
 
             <div class="art-bg">
-                <img src="profile_taipei.jpg" alt="Profile Photo">
+                <img src="profile.jpg" alt="Profile Photo">
             </div>
 
             <div class="art-overlay">
@@ -303,60 +374,88 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-        const scene = document.getElementById("scene");
-        const card = document.getElementById("card");
-    
-        const maxTilt = 25; 
-        let isTouch = false; // タッチ操作かどうかを判定するフラグ
-    
-        // タッチ開始時にフラグを立てる
-        scene.addEventListener("touchstart", () => {
-            isTouch = true;
-        }, { passive: true });
-    
-        function handleMove(e) {
-            // タッチ操作後にブラウザが遅れて発生させる擬似的な mousemove を完全に無視する
-            if (isTouch && e.type === "mousemove") return;
-    
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-    
-            const posX = (clientX - centerX) / (window.innerWidth / 1.5);
-            const posY = (clientY - centerY) / (window.innerHeight / 1.5);
-    
-            const rotateY = posX * maxTilt;
-            const rotateX = -posY * maxTilt; 
-    
-            const glareX = 50 + (posX * 40); 
-            const glareY = 50 + (posY * 40);
-    
-            card.style.setProperty("--rotate-x", `${rotateX}deg`);
-            card.style.setProperty("--rotate-y", `${rotateY}deg`);
-            card.style.setProperty("--glare-x", `${glareX}%`);
-            card.style.setProperty("--glare-y", `${glareY}%`);
+            const scene = document.getElementById("scene");
+            const card = document.getElementById("card");
             
-            card.style.transition = 'none';
-        }
-    
-        function handleLeave() {
-            card.style.setProperty("--rotate-x", `0deg`);
-            card.style.setProperty("--rotate-y", `0deg`);
-            card.style.setProperty("--glare-x", `50%`);
-            card.style.setProperty("--glare-y", `50%`);
+            // --- ポップアップ制御 ---
+            const welcomeModal = document.getElementById("welcome-modal");
+            const closeModalBtn = document.getElementById("close-modal-btn");
+
+            // ページ読み込み後、少し遅延させてポップアップを表示（フワッと感を出すため）
+            setTimeout(() => {
+                welcomeModal.classList.add("show");
+            }, 300);
+
+            // 閉じる関数
+            function closeModal() {
+                welcomeModal.classList.remove("show");
+            }
+
+            // ボタンタップで閉じる
+            closeModalBtn.addEventListener("click", closeModal);
             
-            card.style.transition = 'transform 0.5s ease-out';
-        }
-    
-        scene.addEventListener("mousemove", handleMove);
-        scene.addEventListener("touchmove", handleMove, { passive: true }); 
-    
-        scene.addEventListener("mouseleave", handleLeave);
-        scene.addEventListener("touchend", handleLeave);
-        scene.addEventListener("touchcancel", handleLeave);
-    });
+            // 背景タップでも閉じられるようにする
+            welcomeModal.addEventListener("click", (e) => {
+                if (e.target === welcomeModal) {
+                    closeModal();
+                }
+            });
+
+
+            // --- 3Dカード制御 ---
+            const maxTilt = 25; 
+            let isTouch = false;
+
+            scene.addEventListener("touchstart", () => {
+                isTouch = true;
+            }, { passive: true });
+
+            function handleMove(e) {
+                // ポップアップ表示中はカードを動かさない
+                if (welcomeModal.classList.contains("show")) return;
+                
+                // タッチ後の擬似マウスイベントを無視（タップで固まるバグ防止）
+                if (isTouch && e.type === "mousemove") return;
+
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+
+                const posX = (clientX - centerX) / (window.innerWidth / 1.5);
+                const posY = (clientY - centerY) / (window.innerHeight / 1.5);
+
+                const rotateY = posX * maxTilt;
+                const rotateX = -posY * maxTilt; 
+
+                const glareX = 50 + (posX * 40); 
+                const glareY = 50 + (posY * 40);
+
+                card.style.setProperty("--rotate-x", `${rotateX}deg`);
+                card.style.setProperty("--rotate-y", `${rotateY}deg`);
+                card.style.setProperty("--glare-x", `${glareX}%`);
+                card.style.setProperty("--glare-y", `${glareY}%`);
+                
+                card.style.transition = 'none';
+            }
+
+            function handleLeave() {
+                card.style.setProperty("--rotate-x", `0deg`);
+                card.style.setProperty("--rotate-y", `0deg`);
+                card.style.setProperty("--glare-x", `50%`);
+                card.style.setProperty("--glare-y", `50%`);
+                
+                card.style.transition = 'transform 0.5s ease-out';
+            }
+
+            scene.addEventListener("mousemove", handleMove);
+            scene.addEventListener("touchmove", handleMove, { passive: true }); 
+
+            scene.addEventListener("mouseleave", handleLeave);
+            scene.addEventListener("touchend", handleLeave);
+            scene.addEventListener("touchcancel", handleLeave);
+        });
     </script>
 </body>
 </html>
