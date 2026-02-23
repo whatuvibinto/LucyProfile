@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Instagram Profile</title>
+  <style>
+    /* ベースの設定：スクロールバーを隠し、文字選択を無効化 */
+    body { 
+      margin: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+      overflow: hidden; 
+      background: #fafafa;
+      user-select: none;
+    }
+
+    /* インスタ風のデザイン */
+    .header { padding: 12px; text-align: center; font-weight: bold; border-bottom: 1px solid #dbdbdb; background: white;}
+    .profile-info { display: flex; padding: 20px; align-items: center; background: white;}
+    .avatar { width: 80px; height: 80px; border-radius: 50%; background: #ccc; margin-right: 20px; }
+    .stats { display: flex; gap: 20px; }
+    .stat { text-align: center; font-size: 14px;}
+    .stat span { display: block; font-weight: bold; font-size: 16px;}
+    .bio { padding: 0 20px 20px; font-size: 14px; background: white;}
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .post { background: #ddd; aspect-ratio: 1; }
+    
+    /* 崩壊させる要素の初期設定 */
+    .matter-elem { 
+      will-change: transform; /* アニメーションを滑らかにするおまじない */
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+</head>
+<body>
+
+  <div id="wrapper">
+    <div class="header matter-elem">your_username</div>
+    
+    <div class="profile-info matter-elem">
+      <div class="avatar"></div>
+      <div class="stats">
+        <div class="stat"><span>120</span>投稿</div>
+        <div class="stat"><span>500</span>フォロワー</div>
+        <div class="stat"><span>300</span>フォロー</div>
+      </div>
+    </div>
+    
+    <div class="bio matter-elem">
+      <b>あなたの名前</b><br>
+      こんにちは！ここが私の自己紹介です。<br>
+      リンクは下をチェック👇
+    </div>
+    
+    <div class="grid">
+      <div class="post matter-elem" style="background: #ffb6b9;"></div>
+      <div class="post matter-elem" style="background: #fae3d9;"></div>
+      <div class="post matter-elem" style="background: #bbded6;"></div>
+      <div class="post matter-elem" style="background: #8ac6d1;"></div>
+      <div class="post matter-elem" style="background: #ffb6b9;"></div>
+      <div class="post matter-elem" style="background: #fae3d9;"></div>
+    </div>
+  </div>
+
+  <script>
+    // 画面をタップ（またはクリック）した時に発動
+    document.body.addEventListener('click', () => {
+      if (window.hasStarted) return; // 2回目以降のタップを無視
+      window.hasStarted = true;
+      
+      const Engine = Matter.Engine,
+            World = Matter.World,
+            Bodies = Matter.Bodies,
+            Runner = Matter.Runner;
+
+      const engine = Engine.create();
+      const world = engine.world;
+
+      // 崩壊させるHTML要素を取得
+      const elements = document.querySelectorAll('.matter-elem');
+      const bodiesInfo = [];
+
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      // 見えない「床」と「壁」を作って、要素が画面外に消えないようにする
+      const ground = Bodies.rectangle(width / 2, height + 25, width, 50, { isStatic: true });
+      const leftWall = Bodies.rectangle(-25, height / 2, 50, height, { isStatic: true });
+      const rightWall = Bodies.rectangle(width + 25, height / 2, 50, height, { isStatic: true });
+      World.add(world, [ground, leftWall, rightWall]);
+
+      // 各HTML要素の位置とサイズを読み取り、Matter.jsの物理ボディに変換
+      elements.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+
+        // CSSを絶対配置に切り替えて、物理演算で動かせるように準備
+        el.style.position = 'absolute';
+        el.style.left = rect.left + 'px';
+        el.style.top = rect.top + 'px';
+        el.style.width = rect.width + 'px';
+        el.style.height = rect.height + 'px';
+        el.style.margin = '0';
+        el.style.boxSizing = 'border-box';
+        
+        // 物理ボディの作成（反発力や摩擦を設定）
+        const body = Bodies.rectangle(x, y, rect.width, rect.height, {
+          restitution: 0.4, // 弾み具合（0〜1）
+          friction: 0.5   // 摩擦
+        });
+        
+        World.add(world, body);
+        bodiesInfo.push({ body: body, elem: el, width: rect.width, height: rect.height, initialLeft: rect.left, initialTop: rect.top });
+      });
+
+      // 物理エンジンが更新されるたびに、HTML要素のCSS(transform)を連動させる
+      Matter.Events.on(engine, 'afterUpdate', function() {
+        bodiesInfo.forEach((item) => {
+          const { x, y } = item.body.position;
+          const angle = item.body.angle;
+          
+          const shiftX = x - item.width / 2 - item.initialLeft;
+          const shiftY = y - item.height / 2 - item.initialTop;
+          
+          item.elem.style.transform = `translate(${shiftX}px, ${shiftY}px) rotate(${angle}rad)`;
+        });
+      });
+
+      // 物理エンジンを起動！
+      Runner.run(Runner.create(), engine);
+      
+      // おまけ：スマホをブルッと震わせる（Androidなどで有効）
+      if (navigator.vibrate) {
+        navigator.vibrate(200);
+      }
+    }, { once: true });
+  </script>
+</body>
+</html>
