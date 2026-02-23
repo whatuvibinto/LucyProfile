@@ -3,21 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Interactive 3D Vibe Card</title>
+    <title>MY VIBE</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ==========================================
+           ベース設定
+           ========================================== */
+        :root {
+            --theme-color: #ffffff; 
+            --color-black: #050505;
+            --color-white: #ffffff;
+            --color-gray-300: #d1d5db;
+            --font-sans: 'Inter', 'Noto Sans JP', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-black);
+            color: var(--color-white);
+            font-family: var(--font-sans);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+            overflow: hidden; /* スクロール防止 */
+        }
+
+        /* 3D空間を作るコンテナ */
+        .scene {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1200px; /* 奥行きの深さ */
+        }
+
+        /* ==========================================
+           カード本体
+           ========================================== */
+        .card-container {
+            position: relative;
+            width: 90%;
+            max-width: 400px;
+            aspect-ratio: 9 / 16; 
+            max-height: 750px;
+            border-radius: 28px;
+            
+            /* 3D変換の肝 (overflow:hiddenは描画バグの元なので外す) */
+            transform-style: preserve-3d;
+            transform: rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg));
+            will-change: transform;
+            
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+
+        /* カードの土台・枠線・影レイヤー (Z=0) */
+        .card-border {
+            position: absolute;
+            inset: 0;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: #000;
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.5), 
+                0 0 30px rgba(255, 255, 255, 0.1),
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
+            transform: translateZ(0);
+        }
+        
+        .scene:active .card-border {
+             box-shadow: 
+                0 40px 80px rgba(0,0,0,0.6), 
+                0 0 50px rgba(255, 255, 255, 0.2);
+        }
+
+        /* 背景写真レイヤー (Z=1px) */
+        .art-bg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 60%;
+            z-index: 1;
+            /* 親のoverflowが使えないため個別に角丸 */
+            border-radius: 28px 28px 0 0;
+            overflow: hidden;
+            transform: translateZ(1px); 
+        }
+        .art-bg img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+        }
+        .art-bg::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(0, 0, 0, 0.9) 85%, #000 100%);
+            pointer-events: none;
+        }
+
+        /* 下からの白グラデーション (Z=2px) */
+        .card-gradient {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 70%;
+            z-index: 5;
+            pointer-events: none;
+            background: linear-gradient(to top, var(--theme-color) 0%, rgba(0,0,0,0) 100%);
+            opacity: 0.35;
+            border-radius: 0 0 28px 28px;
+            transform: translateZ(2px);
+        }
+
+        /* 動的な光沢・グレア (Z=30px) */
+        .card-glare {
+            position: absolute;
+            inset: 0;
+            border-radius: 28px;
+            z-index: 30;
+            background: radial-gradient(
+                circle at var(--glare-x, 50%) var(--glare-y, 50%),
+                rgba(255, 255, 255, 0.4) 0%,
+                rgba(255, 255, 255, 0.1) 20%,
+                transparent 60%
+            );
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            transform: translateZ(30px);
+        }
+
+        /* コンテンツレイヤー (Z=40pxに浮かせる) */
+        .art-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 0 24px 50px;
+            align-items: center;
+            text-align: center;
+            transform: translateZ(40px);
+            
+            /* タッチ判定を下の要素に貫通させつつ、子要素はタップ可能にする */
+            pointer-events: none; 
+        }
+
+        .art-overlay > * {
+            pointer-events: auto;
+        }
+
+        /* ==========================================
+           コンテンツ内部
+           ========================================== */
+        .art-header {
+            width: 100%;
+            margin-top: 0;
+            margin-bottom: 35px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .art-title-row {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .art-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin: 0;
+            text-transform: uppercase;
+            line-height: 1.1;
+            text-shadow: 0 0 30px var(--theme-color);
+        }
+
+        .art-meta {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--color-gray-300);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .art-qr-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            width: 100%;
+        }
+
+        /* QRコンテナ */
+        .modal-qr-container {
+            width: 100%;
+            max-width: 190px;
+            aspect-ratio: 1 / 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .modal-qr-container:hover {
+            transform: scale(1.05);
+        }
+
+        .modal-qr-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .qr-caption {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 0.15em;
+            margin: 0;
+            text-transform: uppercase;
+        }
+    </style>
 </head>
 <body>
 
     <div class="scene" id="scene">
+        
         <div class="card-container" id="card">
             
-            <div class="card-glare"></div>
+            <div class="card-border"></div>
             
-            <div class="card-edge"></div>
+            <div class="card-gradient"></div>
+            
+            <div class="card-glare"></div>
 
             <div class="art-bg">
                 <img src="profile.jpg" alt="Profile Photo">
@@ -37,7 +270,7 @@
                 </div>
 
                 <div class="art-qr-section">
-                    <a href="#" class="modal-qr-container">
+                    <a href="https://what-u-vibin-to.netlify.app/qr_links.html?id=6e1cd532-445c-477e-92b4-567343d91f96" class="modal-qr-container" target="_blank">
                         <img src="my_qr.png" alt="My QR Code">
                     </a>
                     <p class="qr-caption">TAP OR SCAN TO FEEL CURRENT VIBE</p>
@@ -47,6 +280,55 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const scene = document.getElementById("scene");
+            const card = document.getElementById("card");
+
+            const maxTilt = 15; // 最大傾斜角度
+
+            function handleMove(e) {
+                // スクロールなどのデフォルト挙動を妨げないように、QRリンクのタップを優先させる
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+
+                const posX = (clientX - centerX) / (window.innerWidth / 1.5);
+                const posY = (clientY - centerY) / (window.innerHeight / 1.5);
+
+                const rotateY = posX * maxTilt;
+                const rotateX = -posY * maxTilt; 
+
+                const glareX = 50 + (posX * 40); 
+                const glareY = 50 + (posY * 40);
+
+                card.style.setProperty("--rotate-x", `${rotateX}deg`);
+                card.style.setProperty("--rotate-y", `${rotateY}deg`);
+                card.style.setProperty("--glare-x", `${glareX}%`);
+                card.style.setProperty("--glare-y", `${glareY}%`);
+                
+                card.style.transition = 'none';
+            }
+
+            function handleLeave() {
+                card.style.setProperty("--rotate-x", `0deg`);
+                card.style.setProperty("--rotate-y", `0deg`);
+                card.style.setProperty("--glare-x", `50%`);
+                card.style.setProperty("--glare-y", `50%`);
+                
+                card.style.transition = 'transform 0.5s ease-out, box-shadow 0.5s ease-out';
+            }
+
+            scene.addEventListener("mousemove", handleMove);
+            // passive: true にすることでリンクのタップ（クリック）を妨害しません
+            scene.addEventListener("touchmove", handleMove, { passive: true }); 
+
+            scene.addEventListener("mouseleave", handleLeave);
+            scene.addEventListener("touchend", handleLeave);
+            scene.addEventListener("touchcancel", handleLeave);
+        });
+    </script>
 </body>
 </html>
