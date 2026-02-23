@@ -2,139 +2,111 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Instagram Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
   <style>
-    /* ベースの設定：スクロールバーを隠し、文字選択を無効化 */
-    body { 
-      margin: 0; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-      overflow: hidden; 
-      background: #fafafa;
-      user-select: none;
+    /* 全体のリセットとベース設定 */
+    body {
+      margin: 0;
+      padding: 0;
+      /* 洗練された印象を与える細字寄りのフォント指定 */
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+      background-color: #f9f9f9; /* 完全な白ではなく、ごくわずかに温かみのあるグレー */
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      letter-spacing: 0.05em;
     }
 
-    /* インスタ風のデザイン */
-    .header { padding: 12px; text-align: center; font-weight: bold; border-bottom: 1px solid #dbdbdb; background: white;}
-    .profile-info { display: flex; padding: 20px; align-items: center; background: white;}
-    .avatar { width: 80px; height: 80px; border-radius: 50%; background: #ccc; margin-right: 20px; }
-    .stats { display: flex; gap: 20px; }
-    .stat { text-align: center; font-size: 14px;}
-    .stat span { display: block; font-weight: bold; font-size: 16px;}
-    .bio { padding: 0 20px 20px; font-size: 14px; background: white;}
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
-    .post { background: #ddd; aspect-ratio: 1; }
-    
-    /* 崩壊させる要素の初期設定 */
-    .matter-elem { 
-      will-change: transform; /* アニメーションを滑らかにするおまじない */
+    /* メインのカード部分 */
+    .profile-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 380px;
+      /* 上下左右にたっぷりと余白（padding）を取るのが洗練のコツ */
+      padding: 60px 40px;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.04); /* 非常に淡く広い影 */
+      text-align: center;
+      box-sizing: border-box;
+      margin: 20px;
+    }
+
+    /* プロフィール画像 */
+    .avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background-color: #f0f0f0;
+      margin: 0 auto 24px;
+      object-fit: cover;
+      /* 画像がない場合のプレースホルダー用の枠線 */
+      border: 1px solid #eaeaea; 
+    }
+
+    /* 名前 */
+    .name {
+      font-size: 22px;
+      font-weight: 400; /* 太すぎないフォントウェイトで上品に */
+      margin: 0 0 8px;
+    }
+
+    /* 拠点（ロケーション） */
+    .location {
+      font-size: 13px;
+      color: #999;
+      letter-spacing: 0.1em;
+      margin: 0 0 48px; /* QRコードとの間に大きな余白を取る */
+    }
+
+    /* QRコードのコンテナ */
+    .qr-wrapper {
+      margin: 0 auto;
+      width: 160px;
+      height: 160px;
+      padding: 12px;
+      background: #ffffff;
+      border: 1px solid #f0f0f0;
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* QRコード画像本体 */
+    .qr-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* スキャンを促すさりげないテキスト */
+    .scan-text {
+      margin-top: 16px;
+      font-size: 11px;
+      color: #bbb;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 <body>
 
-  <div id="wrapper">
-    <div class="header matter-elem">your_username</div>
+  <div class="profile-card">
+    <img src="https://via.placeholder.com/150" alt="Profile" class="avatar">
     
-    <div class="profile-info matter-elem">
-      <div class="avatar"></div>
-      <div class="stats">
-        <div class="stat"><span>120</span>投稿</div>
-        <div class="stat"><span>500</span>フォロワー</div>
-        <div class="stat"><span>300</span>フォロー</div>
-      </div>
-    </div>
+    <h1 class="name">Your Name</h1>
     
-    <div class="bio matter-elem">
-      <b>あなたの名前</b><br>
-      こんにちは！ここが私の自己紹介です。<br>
-      リンクは下をチェック👇
-    </div>
+    <p class="location">Kawasaki, Kanagawa</p>
     
-    <div class="grid">
-      <div class="post matter-elem" style="background: #ffb6b9;"></div>
-      <div class="post matter-elem" style="background: #fae3d9;"></div>
-      <div class="post matter-elem" style="background: #bbded6;"></div>
-      <div class="post matter-elem" style="background: #8ac6d1;"></div>
-      <div class="post matter-elem" style="background: #ffb6b9;"></div>
-      <div class="post matter-elem" style="background: #fae3d9;"></div>
+    <div class="qr-wrapper">
+      <img src="https://via.placeholder.com/150?text=QR+Code" alt="QR Code">
     </div>
+    <p class="scan-text">Scan to connect</p>
   </div>
 
-  <script>
-    // 画面をタップ（またはクリック）した時に発動
-    document.body.addEventListener('click', () => {
-      if (window.hasStarted) return; // 2回目以降のタップを無視
-      window.hasStarted = true;
-      
-      const Engine = Matter.Engine,
-            World = Matter.World,
-            Bodies = Matter.Bodies,
-            Runner = Matter.Runner;
-
-      const engine = Engine.create();
-      const world = engine.world;
-
-      // 崩壊させるHTML要素を取得
-      const elements = document.querySelectorAll('.matter-elem');
-      const bodiesInfo = [];
-
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      // 見えない「床」と「壁」を作って、要素が画面外に消えないようにする
-      const ground = Bodies.rectangle(width / 2, height + 25, width, 50, { isStatic: true });
-      const leftWall = Bodies.rectangle(-25, height / 2, 50, height, { isStatic: true });
-      const rightWall = Bodies.rectangle(width + 25, height / 2, 50, height, { isStatic: true });
-      World.add(world, [ground, leftWall, rightWall]);
-
-      // 各HTML要素の位置とサイズを読み取り、Matter.jsの物理ボディに変換
-      elements.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        const x = rect.left + rect.width / 2;
-        const y = rect.top + rect.height / 2;
-
-        // CSSを絶対配置に切り替えて、物理演算で動かせるように準備
-        el.style.position = 'absolute';
-        el.style.left = rect.left + 'px';
-        el.style.top = rect.top + 'px';
-        el.style.width = rect.width + 'px';
-        el.style.height = rect.height + 'px';
-        el.style.margin = '0';
-        el.style.boxSizing = 'border-box';
-        
-        // 物理ボディの作成（反発力や摩擦を設定）
-        const body = Bodies.rectangle(x, y, rect.width, rect.height, {
-          restitution: 0.4, // 弾み具合（0〜1）
-          friction: 0.5   // 摩擦
-        });
-        
-        World.add(world, body);
-        bodiesInfo.push({ body: body, elem: el, width: rect.width, height: rect.height, initialLeft: rect.left, initialTop: rect.top });
-      });
-
-      // 物理エンジンが更新されるたびに、HTML要素のCSS(transform)を連動させる
-      Matter.Events.on(engine, 'afterUpdate', function() {
-        bodiesInfo.forEach((item) => {
-          const { x, y } = item.body.position;
-          const angle = item.body.angle;
-          
-          const shiftX = x - item.width / 2 - item.initialLeft;
-          const shiftY = y - item.height / 2 - item.initialTop;
-          
-          item.elem.style.transform = `translate(${shiftX}px, ${shiftY}px) rotate(${angle}rad)`;
-        });
-      });
-
-      // 物理エンジンを起動！
-      Runner.run(Runner.create(), engine);
-      
-      // おまけ：スマホをブルッと震わせる（Androidなどで有効）
-      if (navigator.vibrate) {
-        navigator.vibrate(200);
-      }
-    }, { once: true });
-  </script>
 </body>
 </html>
