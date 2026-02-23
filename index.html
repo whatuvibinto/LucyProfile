@@ -34,17 +34,16 @@
             align-items: center;
             min-height: 100vh;
             background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
-            overflow: hidden; /* スクロール防止 */
+            overflow: hidden;
         }
 
-        /* 3D空間を作るコンテナ */
         .scene {
             width: 100%;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            perspective: 1200px; /* 奥行きの深さ */
+            perspective: 1200px;
         }
 
         /* ==========================================
@@ -56,34 +55,48 @@
             max-width: 400px;
             aspect-ratio: 9 / 16; 
             max-height: 750px;
-            border-radius: 28px;
             
-            /* 3D変換の肝 (overflow:hiddenは描画バグの元なので外す) */
             transform-style: preserve-3d;
             transform: rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg));
             will-change: transform;
             
-            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+            transition: transform 0.2s ease-out;
         }
 
-        /* カードの土台・枠線・影レイヤー (Z=0) */
-        .card-border {
+        /* 【3D強化】カード背面に落ちる深い影 (Z=-30px) */
+        .card-shadow {
             position: absolute;
             inset: 0;
             border-radius: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: transparent;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.4);
+            transform: translateZ(-30px);
+            transition: box-shadow 0.2s ease-out;
+        }
+
+        .scene:active .card-shadow {
+            box-shadow: 0 50px 100px rgba(0,0,0,0.9), 0 15px 40px rgba(0,0,0,0.5);
+        }
+
+        /* カードの土台 (Z=0) */
+        .card-base {
+            position: absolute;
+            inset: 0;
+            border-radius: 28px;
             background: #000;
-            box-shadow: 
-                0 30px 60px rgba(0,0,0,0.5), 
-                0 0 30px rgba(255, 255, 255, 0.1),
-                inset 0 0 20px rgba(255, 255, 255, 0.05);
             transform: translateZ(0);
         }
-        
-        .scene:active .card-border {
-             box-shadow: 
-                0 40px 80px rgba(0,0,0,0.6), 
-                0 0 50px rgba(255, 255, 255, 0.2);
+
+        /* 【枠線修正】画像より手前に被せる専用の枠線レイヤー (Z=3px) */
+        .card-frame {
+            position: absolute;
+            inset: 0;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
+            pointer-events: none;
+            z-index: 20;
+            transform: translateZ(3px); 
         }
 
         /* 背景写真レイヤー (Z=1px) */
@@ -92,7 +105,6 @@
             top: 0; left: 0;
             width: 100%; height: 60%;
             z-index: 1;
-            /* 親のoverflowが使えないため個別に角丸 */
             border-radius: 28px 28px 0 0;
             overflow: hidden;
             transform: translateZ(1px); 
@@ -122,7 +134,7 @@
             transform: translateZ(2px);
         }
 
-        /* 動的な光沢・グレア (Z=30px) */
+        /* 動的な光沢・グレア (Z=100px) */
         .card-glare {
             position: absolute;
             inset: 0;
@@ -130,16 +142,17 @@
             z-index: 30;
             background: radial-gradient(
                 circle at var(--glare-x, 50%) var(--glare-y, 50%),
-                rgba(255, 255, 255, 0.4) 0%,
+                rgba(255, 255, 255, 0.5) 0%,
                 rgba(255, 255, 255, 0.1) 20%,
                 transparent 60%
             );
             mix-blend-mode: overlay;
             pointer-events: none;
-            transform: translateZ(30px);
+            /* 【3D強化】光沢を一番手前に */
+            transform: translateZ(100px);
         }
 
-        /* コンテンツレイヤー (Z=40pxに浮かせる) */
+        /* コンテンツレイヤー */
         .art-overlay {
             position: absolute;
             inset: 0;
@@ -150,10 +163,10 @@
             padding: 0 24px 50px;
             align-items: center;
             text-align: center;
-            transform: translateZ(40px);
-            
-            /* タッチ判定を下の要素に貫通させつつ、子要素はタップ可能にする */
             pointer-events: none; 
+            
+            /* 【3D強化】子要素のZ軸移動を許可 */
+            transform-style: preserve-3d;
         }
 
         .art-overlay > * {
@@ -167,7 +180,9 @@
             width: 100%;
             margin-top: 0;
             margin-bottom: 35px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            /* 【3D強化】テキストを画面手前に浮かせる */
+            transform: translateZ(50px);
+            text-shadow: 0 4px 15px rgba(0,0,0,0.8);
         }
 
         .art-title-row {
@@ -181,7 +196,7 @@
             margin: 0;
             text-transform: uppercase;
             line-height: 1.1;
-            text-shadow: 0 0 30px var(--theme-color);
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
         }
 
         .art-meta {
@@ -199,6 +214,8 @@
             justify-content: center;
             gap: 16px;
             width: 100%;
+            /* 【3D強化】QRコードをさらに強く浮かせる */
+            transform: translateZ(80px);
         }
 
         /* QRコンテナ */
@@ -209,8 +226,8 @@
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             border-radius: 16px;
             padding: 16px;
             display: flex;
@@ -221,13 +238,15 @@
         }
 
         .modal-qr-container:hover {
-            transform: scale(1.05);
+            transform: scale(1.05) translateZ(10px);
         }
 
         .modal-qr-container img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            /* 画像自体にも少し影を落とし実体感を出す */
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
         }
 
         .qr-caption {
@@ -237,16 +256,20 @@
             letter-spacing: 0.15em;
             margin: 0;
             text-transform: uppercase;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
         }
     </style>
 </head>
 <body>
 
     <div class="scene" id="scene">
-        
         <div class="card-container" id="card">
             
-            <div class="card-border"></div>
+            <div class="card-shadow"></div>
+
+            <div class="card-base"></div>
+            
+            <div class="card-frame"></div>
             
             <div class="card-gradient"></div>
             
@@ -257,7 +280,6 @@
             </div>
 
             <div class="art-overlay">
-                
                 <div class="art-header">
                     <div class="art-title-row">
                         <h1 class="art-title">LUCY</h1>
@@ -275,7 +297,6 @@
                     </a>
                     <p class="qr-caption">TAP OR SCAN TO FEEL CURRENT VIBE</p>
                 </div>
-
             </div>
         </div>
     </div>
@@ -285,10 +306,10 @@
             const scene = document.getElementById("scene");
             const card = document.getElementById("card");
 
-            const maxTilt = 15; // 最大傾斜角度
+            // 【3D強化】最大傾斜角度を上げて動きをダイナミックに
+            const maxTilt = 25; 
 
             function handleMove(e) {
-                // スクロールなどのデフォルト挙動を妨げないように、QRリンクのタップを優先させる
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
@@ -318,11 +339,10 @@
                 card.style.setProperty("--glare-x", `50%`);
                 card.style.setProperty("--glare-y", `50%`);
                 
-                card.style.transition = 'transform 0.5s ease-out, box-shadow 0.5s ease-out';
+                card.style.transition = 'transform 0.5s ease-out';
             }
 
             scene.addEventListener("mousemove", handleMove);
-            // passive: true にすることでリンクのタップ（クリック）を妨害しません
             scene.addEventListener("touchmove", handleMove, { passive: true }); 
 
             scene.addEventListener("mouseleave", handleLeave);
