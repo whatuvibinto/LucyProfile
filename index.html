@@ -14,8 +14,8 @@
            ベース設定 (これだけでデザインが完結します)
            ========================================== */
         :root {
-            /* ★ ここでテーマカラーを変更できます (紫: #a855f7, 金: #FFD700, 青: #3b82f6 など) */
-            --theme-color: #a855f7; 
+            /* ★ テーマカラーを白に変更 */
+            --theme-color: #ffffff; 
             
             --color-black: #050505;
             --color-white: #ffffff;
@@ -37,8 +37,8 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            /* 背景に少しぼんやりとした光を置く */
-            background-image: radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 60%);
+            /* 背景の光を白（透明度10%）に変更 */
+            background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
         }
 
         .card-container {
@@ -59,11 +59,12 @@
                 max-height: 800px;
                 border-radius: 24px;
                 border: 1px solid var(--theme-color);
-                box-shadow: 0 0 30px rgba(168, 85, 247, 0.2), 0 20px 50px rgba(0,0,0,0.8);
+                /* 影の色もテーマカラー（白）に合わせる */
+                box-shadow: 0 0 30px rgba(255, 255, 255, 0.2), 0 20px 50px rgba(0,0,0,0.8);
             }
         }
 
-        /* 下からのグラデーション */
+        /* 下からのグラデーション (テーマカラーが反映されます) */
         .card-container::before {
             content: '';
             position: absolute;
@@ -81,7 +82,8 @@
         .art-bg {
             position: absolute;
             top: 0; left: 0;
-            width: 100%; height: 50%;
+            /* 写真の表示領域を少し広げる（下寄せの文字と被らないように） */
+            width: 100%; height: 60%;
             z-index: 1;
             background: #111;
         }
@@ -95,7 +97,8 @@
         .art-bg::after {
             content: '';
             position: absolute; inset: 0;
-            background: linear-gradient(to bottom, transparent 0%, transparent 40%, rgba(0, 0, 0, 0.7) 75%, #000 99.5%);
+            /* グラデーションの位置を調整して、下がより暗くなるように */
+            background: linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(0, 0, 0, 0.8) 80%, #000 100%);
             pointer-events: none;
         }
 
@@ -108,9 +111,11 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; 
-            padding-top: 40vh; /* 写真の少し下からコンテンツ開始 */
-            padding-bottom: 40px;
+            /* ★ コンテンツを下寄せに変更 */
+            justify-content: flex-end;
+            padding-top: 0;
+            /* 下に余白を追加 */
+            padding-bottom: 60px;
             padding-left: 24px;
             padding-right: 24px;
             align-items: center;
@@ -120,14 +125,16 @@
         /* ヘッダー情報 (名前・ジャンル等) */
         .art-header {
             width: 100%;
-            margin-bottom: 30px;
+            /* 上寄せ用のネガティブマージンを削除 */
+            margin-top: 0;
+            /* QRコードとの間隔を調整 */
+            margin-bottom: 40px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            margin-top: -60px; 
         }
 
         .art-title-row {
             display: flex; align-items: center; justify-content: center; gap: 10px;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
 
         .art-title {
@@ -144,7 +151,8 @@
             font-size: 0.75rem;
             font-weight: 700;
             background: var(--theme-color);
-            color: #000; /* テーマカラーが明るい場合は#000, 暗い場合は#fffに調整 */
+            /* テーマカラーが白になるため、文字色を黒に設定（※もし追加する場合用） */
+            color: #000000;
             padding: 4px 8px;
             border-radius: 4px;
             transform: translateY(-2px);
@@ -160,22 +168,22 @@
 
         /* QRコードセクション */
         .art-qr-section {
-            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 16px;
             width: 100%;
-            min-height: 0;
-            margin-bottom: auto;
+            /* 上寄せ用のマージンを削除 */
+            margin-bottom: 0;
         }
 
         .modal-qr-container {
             width: 100%;
-            max-width: 240px;
+            /* 下寄せになったため、少し小さく調整してバランスを取る */
+            max-width: 200px;
             aspect-ratio: 1 / 1;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
