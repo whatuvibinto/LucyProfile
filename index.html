@@ -303,52 +303,60 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const scene = document.getElementById("scene");
-            const card = document.getElementById("card");
-
-            // 【3D強化】最大傾斜角度を上げて動きをダイナミックに
-            const maxTilt = 25; 
-
-            function handleMove(e) {
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-                const centerX = window.innerWidth / 2;
-                const centerY = window.innerHeight / 2;
-
-                const posX = (clientX - centerX) / (window.innerWidth / 1.5);
-                const posY = (clientY - centerY) / (window.innerHeight / 1.5);
-
-                const rotateY = posX * maxTilt;
-                const rotateX = -posY * maxTilt; 
-
-                const glareX = 50 + (posX * 40); 
-                const glareY = 50 + (posY * 40);
-
-                card.style.setProperty("--rotate-x", `${rotateX}deg`);
-                card.style.setProperty("--rotate-y", `${rotateY}deg`);
-                card.style.setProperty("--glare-x", `${glareX}%`);
-                card.style.setProperty("--glare-y", `${glareY}%`);
-                
-                card.style.transition = 'none';
-            }
-
-            function handleLeave() {
-                card.style.setProperty("--rotate-x", `0deg`);
-                card.style.setProperty("--rotate-y", `0deg`);
-                card.style.setProperty("--glare-x", `50%`);
-                card.style.setProperty("--glare-y", `50%`);
-                
-                card.style.transition = 'transform 0.5s ease-out';
-            }
-
-            scene.addEventListener("mousemove", handleMove);
-            scene.addEventListener("touchmove", handleMove, { passive: true }); 
-
-            scene.addEventListener("mouseleave", handleLeave);
-            scene.addEventListener("touchend", handleLeave);
-            scene.addEventListener("touchcancel", handleLeave);
-        });
+        const scene = document.getElementById("scene");
+        const card = document.getElementById("card");
+    
+        const maxTilt = 25; 
+        let isTouch = false; // タッチ操作かどうかを判定するフラグ
+    
+        // タッチ開始時にフラグを立てる
+        scene.addEventListener("touchstart", () => {
+            isTouch = true;
+        }, { passive: true });
+    
+        function handleMove(e) {
+            // タッチ操作後にブラウザが遅れて発生させる擬似的な mousemove を完全に無視する
+            if (isTouch && e.type === "mousemove") return;
+    
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+    
+            const posX = (clientX - centerX) / (window.innerWidth / 1.5);
+            const posY = (clientY - centerY) / (window.innerHeight / 1.5);
+    
+            const rotateY = posX * maxTilt;
+            const rotateX = -posY * maxTilt; 
+    
+            const glareX = 50 + (posX * 40); 
+            const glareY = 50 + (posY * 40);
+    
+            card.style.setProperty("--rotate-x", `${rotateX}deg`);
+            card.style.setProperty("--rotate-y", `${rotateY}deg`);
+            card.style.setProperty("--glare-x", `${glareX}%`);
+            card.style.setProperty("--glare-y", `${glareY}%`);
+            
+            card.style.transition = 'none';
+        }
+    
+        function handleLeave() {
+            card.style.setProperty("--rotate-x", `0deg`);
+            card.style.setProperty("--rotate-y", `0deg`);
+            card.style.setProperty("--glare-x", `50%`);
+            card.style.setProperty("--glare-y", `50%`);
+            
+            card.style.transition = 'transform 0.5s ease-out';
+        }
+    
+        scene.addEventListener("mousemove", handleMove);
+        scene.addEventListener("touchmove", handleMove, { passive: true }); 
+    
+        scene.addEventListener("mouseleave", handleLeave);
+        scene.addEventListener("touchend", handleLeave);
+        scene.addEventListener("touchcancel", handleLeave);
+    });
     </script>
 </body>
 </html>
