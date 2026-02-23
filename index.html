@@ -1,160 +1,307 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Editorial Profile</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
-  
-  <style>
-    /* 全体のリセットとベース設定 */
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #0a0a0a; /* 重厚感のある黒背景 */
-      color: #ffffff;
-      font-family: 'Montserrat', sans-serif; /* サブテキストはスッキリしたゴシック体 */
-      overflow-x: hidden;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MY VIBE | WHAT U VIBIN TO?</title>
+    
+    <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
 
-    /* 雑誌のページを見立てたコンテナ */
-    .magazine-page {
-      position: relative;
-      width: 100%;
-      max-width: 480px;
-      height: 100vh;
-      max-height: 850px;
-      background-color: #e5e3db; /* 雑誌の紙のようなオフホワイト */
-      color: #1a1a1a;
-      overflow: hidden;
-      box-shadow: 0 0 40px rgba(0,0,0,0.5);
-    }
+    <style>
+        /* ==========================================
+           ベース設定 (スマホで全画面、PCでカード表示)
+           ========================================== */
+        :root {
+            /* ★ ここでテーマカラーを変更できます (紫: #a855f7, 金: #FFD700 など) */
+            --theme-color: #a855f7; 
+            
+            --color-black: #050505;
+            --color-white: #ffffff;
+            --color-gray-300: #d1d5db;
+            --font-sans: 'Inter', 'Noto Sans JP', sans-serif;
+        }
 
-    /* メインのプロフィール画像 */
-    .hero-image {
-      position: absolute;
-      top: 15%;
-      right: 0;
-      width: 85%;
-      height: 60%;
-      object-fit: cover;
-      /* 画像を少しモノクロ・コントラスト強めにしてアート感を引き出す */
-      filter: grayscale(80%) contrast(120%); 
-      z-index: 1;
-    }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-black);
+            color: var(--color-white);
+            font-family: var(--font-sans);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* 背景に少しぼんやりとした光を置く */
+            background-image: radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 60%);
+        }
 
-    /* 巨大な名前（タイポグラフィ） */
-    .name-title {
-      position: absolute;
-      top: 10%;
-      left: -5%;
-      font-family: 'Playfair Display', serif; /* 美しいセリフ体 */
-      font-size: 85px; /* 画面からはみ出るくらいの大きさ */
-      font-weight: 800;
-      line-height: 0.85;
-      letter-spacing: -0.02em;
-      text-transform: uppercase;
-      z-index: 2; /* 画像の上に重ねる */
-      mix-blend-mode: multiply; /* 画像と文字が重なった部分のインクが濃くなる効果 */
-    }
+        .card-container {
+            position: relative;
+            width: 100%;
+            height: 100svh; /* スマホでは全画面 */
+            background: #000;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-    /* 名前の2行目（イタリック体で変化をつける） */
-    .name-title span {
-      display: block;
-      font-style: italic;
-      font-weight: 400;
-      font-size: 95px;
-      margin-left: 20px;
-    }
+        /* PC等で見た時は中央にカードとして表示 */
+        @media (min-width: 481px) {
+            .card-container {
+                width: 420px;
+                height: 85vh;
+                max-height: 800px;
+                border-radius: 24px;
+                border: 1px solid var(--theme-color);
+                box-shadow: 0 0 30px rgba(168, 85, 247, 0.2), 0 20px 50px rgba(0,0,0,0.8);
+            }
+        }
 
-    /* 縦書きのアクセントテキスト */
-    .vertical-text {
-      position: absolute;
-      left: 20px;
-      bottom: 50px;
-      writing-mode: vertical-rl; /* 縦書き指定 */
-      transform: rotate(180deg); /* 下から上へ読ませる */
-      font-size: 11px;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      font-weight: 500;
-      z-index: 3;
-    }
+        /* 下からのグラデーション */
+        .card-container::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 70%;
+            z-index: 5;
+            pointer-events: none;
+            background: linear-gradient(to top, var(--theme-color) 0%, rgba(0,0,0,0) 100%);
+            opacity: 0.5;
+        }
 
-    /* 拠点などのメタ情報 */
-    .meta-info {
-      position: absolute;
-      top: 30px;
-      right: 20px;
-      text-align: right;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      border-bottom: 1px solid #1a1a1a;
-      padding-bottom: 5px;
-      z-index: 3;
-    }
+        /* ==========================================
+           写真エリア (上半分)
+           ========================================== */
+        .art-bg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 50%;
+            z-index: 1;
+            background: #111;
+        }
+        .art-bg img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+        }
+        .art-bg::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, transparent 0%, transparent 40%, rgba(0, 0, 0, 0.7) 75%, #000 99.5%);
+            pointer-events: none;
+        }
 
-    /* QRコードエリア（雑誌のバーコード風） */
-    .qr-section {
-      position: absolute;
-      bottom: 30px;
-      right: 20px;
-      background: #ffffff;
-      padding: 10px;
-      z-index: 3;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      border: 1px solid #1a1a1a;
-    }
+        /* ==========================================
+           コンテンツエリア (写真の上に重なる)
+           ========================================== */
+        .art-overlay {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; 
+            padding-top: 40vh; /* 写真の少し下からコンテンツ開始 */
+            padding-bottom: 30px;
+            padding-left: 24px;
+            padding-right: 24px;
+            align-items: center;
+            text-align: center;
+        }
 
-    .qr-section img {
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
-    }
+        /* ヘッダー情報 (名前・ジャンル等) */
+        .art-header {
+            width: 100%;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            margin-top: -60px; 
+        }
 
-    /* QR下のキャプション */
-    .qr-caption {
-      margin-top: 5px;
-      font-size: 8px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-  </style>
+        .art-title-row {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .art-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin: 0;
+            text-transform: uppercase;
+            line-height: 1.1;
+            text-shadow: 0 0 30px var(--theme-color);
+        }
+
+        .art-role-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: var(--theme-color);
+            color: #000; /* テーマカラーが明るい場合は#000, 暗い場合は#fffに調整 */
+            padding: 4px 8px;
+            border-radius: 4px;
+            transform: translateY(-2px);
+        }
+
+        .art-meta {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--color-gray-300);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* QRコードセクション */
+        .art-qr-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            min-height: 0;
+        }
+
+        .modal-qr-container {
+            width: 100%;
+            max-width: 220px;
+            aspect-ratio: 1 / 1;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+            text-decoration: none; /* リンクの線を消す */
+        }
+        
+        .modal-qr-container:hover {
+            transform: scale(1.05);
+        }
+
+        .modal-qr-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+
+        .qr-caption {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 0.15em;
+            margin-top: 4px;
+        }
+
+        /* Instagramボタン */
+        .art-social {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 9999px;
+            color: var(--color-white);
+            text-decoration: none;
+            transition: all 0.3s;
+            margin-top: auto; /* 一番下に寄せる */
+            width: 80%;
+            max-width: 250px;
+            box-sizing: border-box;
+        }
+
+        .art-social:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .art-social img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .social-id {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="magazine-page">
-    <div class="meta-info">
-      Kawasaki, Kanagawa<br>
-      Vol. 01 — Exclusive
+    <div class="card-container">
+        <div class="art-bg">
+            <img src="images/sample_card.png" alt="Profile Photo">
+        </div>
+
+        <div class="art-overlay">
+            
+            <div class="art-header">
+                <div class="art-title-row">
+                    <h1 class="art-title">DJ VIBES</h1>
+                    <span class="art-role-badge">DJ</span>
+                </div>
+                <div class="art-meta">
+                    <span>TOKYO</span>
+                    <span>—</span>
+                    <span>HOUSE / TECHNO</span>
+                </div>
+            </div>
+
+            <div class="art-qr-section">
+                <a href="qr_links.html?id=あなたのIDをここに入れる" class="modal-qr-container" id="qrContainer">
+                    </a>
+                <p class="qr-caption">TAP OR SCAN TO FEEL CURRENT VIBE</p>
+            </div>
+
+            <a href="https://instagram.com/あなたのID" target="_blank" class="art-social">
+                <img src="images/InstagramLogo.png" alt="Instagram">
+                <span class="social-id">@your_insta_id</span>
+            </a>
+
+        </div>
     </div>
 
-    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Fashion Portrait" class="hero-image">
+    <script>
+        // ==========================================
+        // ★ QRコードの自動描画スクリプト
+        // ==========================================
+        document.addEventListener("DOMContentLoaded", () => {
+            const qrContainer = document.getElementById('qrContainer');
+            
+            // ★QRコードに埋め込むURL (あなたのVIBIN QRのURL)
+            // 例: https://whatuvibinto.com/qr_links.html?id=123456
+            const myQrUrl = window.location.origin + "/qr_links.html?id=あなたのID"; 
 
-    <h1 class="name-title">
-      Your
-      <span>Name.</span>
-    </h1>
-
-    <div class="vertical-text">
-      The Next Chapter / Scan to discover more.
-    </div>
-
-    <div class="qr-section">
-      <img src="https://via.placeholder.com/150?text=QR" alt="QR Code">
-      <div class="qr-caption">Scan Me</div>
-    </div>
-  </div>
-
+            const qrCode = new QRCodeStyling({
+                width: 400, 
+                height: 400, 
+                type: "canvas", 
+                data: myQrUrl, 
+                // 真ん中のロゴ画像 (不要ならコメントアウト)
+                image: "images/qr_logo.PNG",
+                qrOptions: { errorCorrectionLevel: "H" },
+                imageOptions: { crossOrigin: "anonymous", margin: 10, imageSize: 0.4, hideBackgroundDots: true },
+                // ★デザイン (A=square, B=rounded, C=dots のように変更可能)
+                dotsOptions: { type: 'square', color: '#ffffff' }, 
+                cornersSquareOptions: { type: 'square', color: '#ffffff' }, 
+                cornersDotOptions: { type: 'square', color: '#ffffff' }, 
+                backgroundOptions: { color: 'transparent' }
+            });
+            
+            qrCode.append(qrContainer);
+        });
+    </script>
 </body>
 </html>
