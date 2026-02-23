@@ -3,253 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MY VIBE</title>
+    <title>Interactive 3D Vibe Card</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
-
-    <style>
-        /* ==========================================
-           ベース設定
-           ========================================== */
-        :root {
-            /* ★ テーマカラーを白に設定 */
-            --theme-color: #ffffff; 
-            
-            --color-black: #050505;
-            --color-white: #ffffff;
-            --color-gray-300: #d1d5db;
-            --font-sans: 'Inter', 'Noto Sans JP', sans-serif;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--color-black);
-            color: var(--color-white);
-            font-family: var(--font-sans);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            /* 背景の光を白（透明度10%）に */
-            background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
-        }
-
-        /* ==========================================
-           カード本体 (スマホでもPCでもカード状に表示)
-           ========================================== */
-        .card-container {
-            position: relative;
-            /* 画面端に少し余白を持たせる */
-            width: 92%;
-            max-width: 420px;
-            /* 画面上下にも少し余白を持たせる */
-            height: 85svh; 
-            max-height: 800px;
-            background: #000;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            border-radius: 28px;
-            
-            /* カードの枠線と光沢感・浮遊感の影 */
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 
-                0 20px 50px rgba(0,0,0,0.9), 
-                0 0 30px rgba(255, 255, 255, 0.1),
-                inset 0 0 20px rgba(255, 255, 255, 0.05); /* 内側の微かな反射 */
-        }
-
-        /* カード上部のガラス光沢（ハイライト） */
-        .card-container::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 150px;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, transparent 100%);
-            pointer-events: none;
-            z-index: 20;
-        }
-
-        /* 下からのグラデーション (テーマカラーが反映されます) */
-        .card-container::before {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0;
-            width: 100%; height: 70%;
-            z-index: 5;
-            pointer-events: none;
-            background: linear-gradient(to top, var(--theme-color) 0%, rgba(0,0,0,0) 100%);
-            opacity: 0.35;
-        }
-
-        /* ==========================================
-           写真エリア (上半分)
-           ========================================== */
-        .art-bg {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 60%;
-            z-index: 1;
-            background: #111;
-        }
-        .art-bg img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            opacity: 0.9;
-        }
-        
-        /* 写真と黒背景を自然に馴染ませるグラデーション */
-        .art-bg::after {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(0, 0, 0, 0.8) 80%, #000 100%);
-            pointer-events: none;
-        }
-
-        /* ==========================================
-           コンテンツエリア (下寄せ)
-           ========================================== */
-        .art-overlay {
-            position: relative;
-            z-index: 10;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding-top: 0;
-            padding-bottom: 50px; /* 下の余白 */
-            padding-left: 24px;
-            padding-right: 24px;
-            align-items: center;
-            text-align: center;
-        }
-
-        /* ヘッダー情報 (名前・ジャンル等) */
-        .art-header {
-            width: 100%;
-            margin-top: 0;
-            margin-bottom: 35px; /* QRコードとの間隔 */
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
-
-        .art-title-row {
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .art-title {
-            font-size: 2.2rem;
-            font-weight: 900;
-            margin: 0;
-            text-transform: uppercase;
-            line-height: 1.1;
-            text-shadow: 0 0 30px var(--theme-color);
-        }
-
-        .art-role-badge {
-            display: inline-block;
-            font-size: 0.75rem;
-            font-weight: 700;
-            background: var(--theme-color);
-            color: #000000;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transform: translateY(-2px);
-        }
-
-        .art-meta {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--color-gray-300);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* QRコードセクション */
-        .art-qr-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            width: 100%;
-            margin-bottom: 0;
-        }
-
-        .modal-qr-container {
-            width: 100%;
-            max-width: 190px; /* カードサイズに合わせて少し調整 */
-            aspect-ratio: 1 / 1;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border-radius: 16px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.3s;
-            text-decoration: none;
-        }
-        
-        .modal-qr-container:hover {
-            transform: scale(1.05);
-        }
-
-        .modal-qr-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .qr-caption {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.8);
-            letter-spacing: 0.15em;
-            margin: 0;
-            text-transform: uppercase;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="card-container">
-        <div class="art-bg">
-            <img src="profile.jpg" alt="Profile Photo">
-        </div>
-
-        <div class="art-overlay">
+    <div class="scene" id="scene">
+        <div class="card-container" id="card">
             
-            <div class="art-header">
-                <div class="art-title-row">
-                    <h1 class="art-title">LUCY</h1>
+            <div class="card-glare"></div>
+            
+            <div class="card-edge"></div>
+
+            <div class="art-bg">
+                <img src="profile.jpg" alt="Profile Photo">
+            </div>
+
+            <div class="art-overlay">
+                
+                <div class="art-header">
+                    <div class="art-title-row">
+                        <h1 class="art-title">LUCY</h1>
                     </div>
-                <div class="art-meta">
-                    <span>TOKYO</span>
-                    <span>—</span>
-                    <span>HIPHOP / R&B / DUB</span>
+                    <div class="art-meta">
+                        <span>TOKYO</span>
+                        <span>—</span>
+                        <span>HIPHOP / R&B / DUB</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="art-qr-section">
-                <a href="https://what-u-vibin-to.netlify.app/qr_links.html?id=6e1cd532-445c-477e-92b4-567343d91f96" class="modal-qr-container">
-                    <img src="my_qr.png" alt="My QR Code">
-                </a>
-                <p class="qr-caption">TAP OR SCAN TO FEEL CURRENT VIBE</p>
-            </div>
+                <div class="art-qr-section">
+                    <a href="#" class="modal-qr-container">
+                        <img src="my_qr.png" alt="My QR Code">
+                    </a>
+                    <p class="qr-caption">TAP OR SCAN TO FEEL CURRENT VIBE</p>
+                </div>
 
+            </div>
         </div>
     </div>
 
+    <script src="script.js"></script>
 </body>
 </html>
