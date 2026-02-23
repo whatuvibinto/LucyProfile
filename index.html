@@ -3,109 +3,157 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile</title>
+  <title>Editorial Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+  
   <style>
     /* 全体のリセットとベース設定 */
     body {
       margin: 0;
       padding: 0;
-      /* 洗練された印象を与える細字寄りのフォント指定 */
-      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
-      background-color: #f9f9f9; /* 完全な白ではなく、ごくわずかに温かみのあるグレー */
-      color: #333;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background-color: #0a0a0a; /* 重厚感のある黒背景 */
+      color: #ffffff;
+      font-family: 'Montserrat', sans-serif; /* サブテキストはスッキリしたゴシック体 */
+      overflow-x: hidden;
       min-height: 100vh;
-      letter-spacing: 0.05em;
-    }
-
-    /* メインのカード部分 */
-    .profile-card {
-      background: #ffffff;
-      width: 100%;
-      max-width: 380px;
-      /* 上下左右にたっぷりと余白（padding）を取るのが洗練のコツ */
-      padding: 60px 40px;
-      border-radius: 20px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.04); /* 非常に淡く広い影 */
-      text-align: center;
-      box-sizing: border-box;
-      margin: 20px;
-    }
-
-    /* プロフィール画像 */
-    .avatar {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      background-color: #f0f0f0;
-      margin: 0 auto 24px;
-      object-fit: cover;
-      /* 画像がない場合のプレースホルダー用の枠線 */
-      border: 1px solid #eaeaea; 
-    }
-
-    /* 名前 */
-    .name {
-      font-size: 22px;
-      font-weight: 400; /* 太すぎないフォントウェイトで上品に */
-      margin: 0 0 8px;
-    }
-
-    /* 拠点（ロケーション） */
-    .location {
-      font-size: 13px;
-      color: #999;
-      letter-spacing: 0.1em;
-      margin: 0 0 48px; /* QRコードとの間に大きな余白を取る */
-    }
-
-    /* QRコードのコンテナ */
-    .qr-wrapper {
-      margin: 0 auto;
-      width: 160px;
-      height: 160px;
-      padding: 12px;
-      background: #ffffff;
-      border: 1px solid #f0f0f0;
-      border-radius: 16px;
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
-    /* QRコード画像本体 */
-    .qr-wrapper img {
+    /* 雑誌のページを見立てたコンテナ */
+    .magazine-page {
+      position: relative;
       width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
+      max-width: 480px;
+      height: 100vh;
+      max-height: 850px;
+      background-color: #e5e3db; /* 雑誌の紙のようなオフホワイト */
+      color: #1a1a1a;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0,0,0,0.5);
     }
 
-    /* スキャンを促すさりげないテキスト */
-    .scan-text {
-      margin-top: 16px;
-      font-size: 11px;
-      color: #bbb;
+    /* メインのプロフィール画像 */
+    .hero-image {
+      position: absolute;
+      top: 15%;
+      right: 0;
+      width: 85%;
+      height: 60%;
+      object-fit: cover;
+      /* 画像を少しモノクロ・コントラスト強めにしてアート感を引き出す */
+      filter: grayscale(80%) contrast(120%); 
+      z-index: 1;
+    }
+
+    /* 巨大な名前（タイポグラフィ） */
+    .name-title {
+      position: absolute;
+      top: 10%;
+      left: -5%;
+      font-family: 'Playfair Display', serif; /* 美しいセリフ体 */
+      font-size: 85px; /* 画面からはみ出るくらいの大きさ */
+      font-weight: 800;
+      line-height: 0.85;
+      letter-spacing: -0.02em;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
+      z-index: 2; /* 画像の上に重ねる */
+      mix-blend-mode: multiply; /* 画像と文字が重なった部分のインクが濃くなる効果 */
+    }
+
+    /* 名前の2行目（イタリック体で変化をつける） */
+    .name-title span {
+      display: block;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 95px;
+      margin-left: 20px;
+    }
+
+    /* 縦書きのアクセントテキスト */
+    .vertical-text {
+      position: absolute;
+      left: 20px;
+      bottom: 50px;
+      writing-mode: vertical-rl; /* 縦書き指定 */
+      transform: rotate(180deg); /* 下から上へ読ませる */
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      font-weight: 500;
+      z-index: 3;
+    }
+
+    /* 拠点などのメタ情報 */
+    .meta-info {
+      position: absolute;
+      top: 30px;
+      right: 20px;
+      text-align: right;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #1a1a1a;
+      padding-bottom: 5px;
+      z-index: 3;
+    }
+
+    /* QRコードエリア（雑誌のバーコード風） */
+    .qr-section {
+      position: absolute;
+      bottom: 30px;
+      right: 20px;
+      background: #ffffff;
+      padding: 10px;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid #1a1a1a;
+    }
+
+    .qr-section img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+    }
+
+    /* QR下のキャプション */
+    .qr-caption {
+      margin-top: 5px;
+      font-size: 8px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
     }
   </style>
 </head>
 <body>
 
-  <div class="profile-card">
-    <img src="https://via.placeholder.com/150" alt="Profile" class="avatar">
-    
-    <h1 class="name">Your Name</h1>
-    
-    <p class="location">Kawasaki, Kanagawa</p>
-    
-    <div class="qr-wrapper">
-      <img src="https://via.placeholder.com/150?text=QR+Code" alt="QR Code">
+  <div class="magazine-page">
+    <div class="meta-info">
+      Kawasaki, Kanagawa<br>
+      Vol. 01 — Exclusive
     </div>
-    <p class="scan-text">Scan to connect</p>
+
+    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Fashion Portrait" class="hero-image">
+
+    <h1 class="name-title">
+      Your
+      <span>Name.</span>
+    </h1>
+
+    <div class="vertical-text">
+      The Next Chapter / Scan to discover more.
+    </div>
+
+    <div class="qr-section">
+      <img src="https://via.placeholder.com/150?text=QR" alt="QR Code">
+      <div class="qr-caption">Scan Me</div>
+    </div>
   </div>
 
 </body>
