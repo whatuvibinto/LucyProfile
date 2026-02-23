@@ -152,7 +152,8 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 0 24px 50px;
+            /* 下部のパディングを少し減らしてQRのスペースを確保 */
+            padding: 0 24px 40px;
             align-items: center;
             text-align: center;
             pointer-events: none; 
@@ -166,7 +167,8 @@
         .art-header {
             width: 100%;
             margin-top: 0;
-            margin-bottom: 35px;
+            /* QRとの間隔を少し詰める */
+            margin-bottom: 25px;
             transform: translateZ(50px);
             text-shadow: 0 4px 15px rgba(0,0,0,0.8);
         }
@@ -193,27 +195,31 @@
             letter-spacing: 0.05em;
         }
 
+        /* --- QRセクションの調整 --- */
         .art-qr-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 16px;
+            /* QRとキャプションの間隔を広げる */
+            gap: 20px;
             width: 100%;
             transform: translateZ(80px);
         }
 
         .modal-qr-container {
             width: 100%;
-            max-width: 190px;
+            /* 最大幅を大幅に拡大して存在感を出す */
+            max-width: 280px; 
             aspect-ratio: 1 / 1;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            border-radius: 16px;
-            padding: 16px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+            /* サイズに合わせて角丸とパディングを大きく */
+            border-radius: 24px;
+            padding: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -222,7 +228,7 @@
         }
 
         .modal-qr-container:hover {
-            transform: scale(1.05) translateZ(10px);
+            transform: scale(1.03) translateZ(10px);
         }
 
         .modal-qr-container img {
@@ -233,9 +239,10 @@
         }
 
         .qr-caption {
-            font-size: 0.8rem;
+            /* QRのサイズに合わせて文字も少し大きく */
+            font-size: 0.95rem;
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.9);
             letter-spacing: 0.15em;
             margin: 0;
             text-transform: uppercase;
@@ -253,7 +260,7 @@
             justify-content: center;
             align-items: center;
             background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px); /* 背景をぼかす */
+            backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             opacity: 0;
             pointer-events: none;
@@ -328,11 +335,10 @@
 
     <div id="welcome-modal" class="welcome-modal">
         <div class="welcome-modal-content">
-            <h2>Wassup bro</h2>
+            <h2>NOTICE</h2>
             <p>
-                <span class="ja-text">このページに表示されているQRは、<br>
-                    時間帯によってリンク先(Spotify Playlist)が変わります。
-                </span>
+                The destination of the QR code changes depending on the time of day.<br>
+                <span class="ja-text">時間帯によってリンク先が変わります。</span>
             </p>
             <button id="close-modal-btn" class="close-btn">GOT IT</button>
         </div>
@@ -348,7 +354,7 @@
             <div class="card-glare"></div>
 
             <div class="art-bg">
-                <img src="profile_taipei.jpg" alt="Profile Photo">
+                <img src="profile.jpg" alt="Profile Photo">
             </div>
 
             <div class="art-overlay">
@@ -378,32 +384,25 @@
             const scene = document.getElementById("scene");
             const card = document.getElementById("card");
             
-            // --- ポップアップ制御 ---
             const welcomeModal = document.getElementById("welcome-modal");
             const closeModalBtn = document.getElementById("close-modal-btn");
 
-            // ページ読み込み後、少し遅延させてポップアップを表示（フワッと感を出すため）
             setTimeout(() => {
                 welcomeModal.classList.add("show");
             }, 300);
 
-            // 閉じる関数
             function closeModal() {
                 welcomeModal.classList.remove("show");
             }
 
-            // ボタンタップで閉じる
             closeModalBtn.addEventListener("click", closeModal);
             
-            // 背景タップでも閉じられるようにする
             welcomeModal.addEventListener("click", (e) => {
                 if (e.target === welcomeModal) {
                     closeModal();
                 }
             });
 
-
-            // --- 3Dカード制御 ---
             const maxTilt = 25; 
             let isTouch = false;
 
@@ -412,10 +411,8 @@
             }, { passive: true });
 
             function handleMove(e) {
-                // ポップアップ表示中はカードを動かさない
                 if (welcomeModal.classList.contains("show")) return;
                 
-                // タッチ後の擬似マウスイベントを無視（タップで固まるバグ防止）
                 if (isTouch && e.type === "mousemove") return;
 
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
