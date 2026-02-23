@@ -1,0 +1,226 @@
+/* ==========================================
+   ベース設定
+   ========================================== */
+:root {
+    --theme-color: #ffffff; 
+    --color-black: #050505;
+    --color-white: #ffffff;
+    --color-gray-300: #d1d5db;
+    --font-sans: 'Inter', 'Noto Sans JP', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-black);
+    color: var(--color-white);
+    font-family: var(--font-sans);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+    overflow: hidden; /* スクロール防止 */
+}
+
+/* ==========================================
+   3Dシーンとカードの定義
+   ========================================== */
+/* 3D空間を作るコンテナ */
+.scene {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1200px; /* 奥行きの深さ */
+    touch-action: none; /* スマホでのスクロールを無効化して操作に専念 */
+}
+
+/* カード本体 */
+.card-container {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    /* スマホでの表示領域を確保しつつ、極端に縦長にならないように調整 */
+    aspect-ratio: 9 / 16; 
+    max-height: 750px;
+
+    background: #000;
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    
+    /* 3D変換の肝 */
+    transform-style: preserve-3d;
+    /* JSで計算した角度をCSS変数で受け取る */
+    transform: rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg));
+    will-change: transform; /* パフォーマンス最適化 */
+    
+    box-shadow: 
+        0 30px 60px rgba(0,0,0,0.5), 
+        0 0 30px rgba(255, 255, 255, 0.1);
+    
+    /* 操作をやめたときに滑らかに戻るトランジション */
+    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+}
+
+/* 操作中の影の変化 */
+.scene:active .card-container {
+     box-shadow: 
+        0 40px 80px rgba(0,0,0,0.6), 
+        0 0 50px rgba(255, 255, 255, 0.2);
+}
+
+
+/* ==========================================
+   3Dレイヤーと質感
+   ========================================== */
+
+/* 動的な光沢（グレア） */
+.card-glare {
+    position: absolute;
+    inset: 0;
+    border-radius: 28px;
+    z-index: 30;
+    /* JSで計算した光の位置を受け取る */
+    background: radial-gradient(
+        circle at var(--glare-x, 50%) var(--glare-y, 50%),
+        rgba(255, 255, 255, 0.4) 0%,
+        rgba(255, 255, 255, 0.1) 20%,
+        transparent 60%
+    );
+    mix-blend-mode: overlay; /* 下のレイヤーと合成して光沢感を出す */
+    pointer-events: none;
+    transform: translateZ(1px); /* 表面に貼り付ける */
+}
+
+/* カードの厚み（側面）を擬似的に表現 */
+.card-edge {
+    position: absolute;
+    inset: 0;
+    border-radius: 28px;
+    z-index: -1;
+    transform: translateZ(-10px); /* 本体より奥に配置 */
+    box-shadow: 
+        inset 0 0 0 2px rgba(255,255,255,0.1),
+        0 0 10px rgba(0,0,0,0.8);
+    background: rgba(20, 20, 20, 1);
+}
+
+/* 背景写真レイヤー (少し奥へ) */
+.art-bg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 60%;
+    z-index: 1;
+    border-radius: 28px 28px 0 0;
+    overflow: hidden;
+    transform: translateZ(-5px); /* わずかに奥へ */
+}
+.art-bg img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.9;
+}
+.art-bg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(0, 0, 0, 0.9) 85%, #000 100%);
+    pointer-events: none;
+}
+
+/* コンテンツレイヤー (手前へ浮かせる) */
+.art-overlay {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 24px 50px;
+    align-items: center;
+    text-align: center;
+    /* 重要な3D効果: コンテンツを手前に浮かせる */
+    transform: translateZ(40px);
+    text-shadow: 0 4px 8px rgba(0,0,0,0.5); /* 影も浮かせる */
+}
+
+/* ==========================================
+   コンテンツ内部
+   ========================================== */
+.art-header {
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 35px;
+}
+
+.art-title-row {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-bottom: 8px;
+}
+
+.art-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    margin: 0;
+    text-transform: uppercase;
+    line-height: 1.1;
+    color: var(--theme-color);
+}
+
+.art-meta {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-gray-300);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.art-qr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+}
+
+/* QRコンテナもさらに浮かせる */
+.modal-qr-container {
+    width: 100%;
+    max-width: 190px;
+    aspect-ratio: 1 / 1;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    
+    /* 親要素よりさらに手前に配置 */
+    transform: translateZ(20px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+.modal-qr-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.qr-caption {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 0.15em;
+    margin: 0;
+    text-transform: uppercase;
+}
